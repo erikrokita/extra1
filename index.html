@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Js Canvas</title>
+		<link rel="stylesheet" type="text/css" href="extra1.css">	<!--links css file-->
+	</head>
+	<body onresize="updateCanvasOffset()">
+		<div id="shape-container"><canvas id="mainCanvas" onmouseup="displayShape()" onmousedown="beginDraw(event)" onmousemove="canvasGetCoords(event)" onmouseout="canvasClearCoords()">
+			<!--canvas for drawing javascript shapes-->
+		</canvas></div>
+		<div id="shape-container-info">
+			<p>Mouse coordinates: </p><p id="mouseCoordsOutput">(0,0)<p/>
+		</div>
+		<div id="property-container">
+			<div id="spawn-shape">
+				<p>Type: </p><select onmouseup="shapePropertiesUpdate()" id="select-shape-type" name="shapeType">
+					<option value="circle">Circle</option>
+					<option value="rectangle">Rectangle</option>
+					<option value="line">Line</option>
+					<option value="text">Text</option>
+				</select><br/>
+				<input id="canvasTextProperty" type="text" maxlength="20" placeholder="text to display" disabled /><br/>
+				<input id="canvasTextSizeProperty" type="text" maxlength="5" placeholder="size of text" disabled /><br/>
+				<input id="spawnshape_isFilled" type="checkbox" value="Fill" name="fill" /><p>Fill Shape</p><br/><br/>
+				<input id="btnClearCanvas" value="Clear Canvas" type="button" onClick="clearCanvas()"/><br/><br/>
+				<p class="input-header">Background Color:</p><br/>
+				<p>Red: </p><input id="slider_BgRED" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderBgRED">128</p><br/>
+				<p>Blue: </p><input id="slider_BgBLUE" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderBgBLUE">128</p><br/>
+				<p>Green: </p><input id="slider_BgGREEN" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderBgGREEN">128</p><br/>
+				<p>Alpha: </p><input id="slider_BgALPHA" class="slider" type="range" min="0" max="1" value="1" /> <p id="output_sliderBgALPHA">1</p>
+			</div>
+			<div id="slider-color-container">
+				<p class="input-header">Fill Color:</p><br/>
+				<p>Red: </p><input id="slider_RED" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderRED">128</p><br/>
+				<p>Blue: </p><input id="slider_BLUE" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderBLUE">128</p><br/>
+				<p>Green: </p><input id="slider_GREEN" class="slider" type="range" min="0" max="255" value="128" /> <p id="output_sliderGREEN">128</p><br/>
+				<p>Alpha: </p><input id="slider_ALPHA" class="slider" type="range" min="0" max="1" value="1" /> <p id="output_sliderALPHA">1</p>
+			</div>
+			<div id="slider-border-container">
+				<p class="input-header">Shape Outline:</p><br/>
+				<p>Red: </p><input id="slider_Border_RED" class="slider" type="range" min="0" max="255" value="0" /> <p id="output_slider_border_RED">0</p><br/>
+				<p>Blue: </p><input id="slider_Border_BLUE" class="slider" type="range" min="0" max="255" value="0" /> <p id="output_slider_border_BLUE">0</p><br/>
+				<p>Green: </p><input id="slider_Border_GREEN" class="slider" type="range" min="0" max="255" value="0" /> <p id="output_slider_border_GREEN">0</p><br/>
+				<p>Thickness: </p><input id="slider_Border_THICC" class="slider" type="range" min="1" max="50" value="1" /> <p id="output_slider_border_THICC">1</p>
+			</div>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>	<!--links jquery-->
+		<script src="extra1.js"></script>							<!--links js file-->
+		<script type="text/javascript">
+			//this program demonstrates the usage of data types, functions, loops, data structures
+			
+			//variables to hold mouse position
+			var mouseX, mouseY, mouseStartX, mouseStartY;
+			var canvasXOffset = (0.05 * window.innerWidth);
+			var canvasYOffset = (0.008 * window.innerHeight);
+			
+			//function to change canvas offset value when the browser window is changed
+			function updateCanvasOffset(){
+				canvasXOffset = (0.05 * window.innerWidth);
+				canvasYOffset = (0.008 * window.innerHeight);
+			}
+			
+			//sliders are defined in the "externa1 javascript file"
+			
+			console.log("don't mind me just makin sure console logging works");
+			
+			//instantiate canvas
+			var c = document.getElementById("mainCanvas");
+			var ctx = c.getContext("2d");
+			ctx.canvas.width = window.innerWidth * 0.9;
+			ctx.canvas.height = window.innerHeight * 0.55;
+			
+			//resize canvas on window resize
+			var onresize = function e(){
+				ctx.canvas.width = window.innerWidth * 0.9;
+				ctx.canvas.height = window.innerHeight * 0.55;
+			}
+			window.addEventListener("resize", onresize);
 
+			console.log("Generated canvas with size (" + ctx.canvas.width + ", " + ctx.canvas.height + ")");
+			
+			//function to get mouse coords in canvas
+			function canvasGetCoords(e){
+				mouseX = e.clientX;
+				mouseY = e.clientY;
+				//document.getElementById("mouseCoordsOutput").innerHTML = "(" + mouseX + "," + mouseY + ")";
+				$("#mouseCoordsOutput").html("(" + mouseX + "," + mouseY + ")");	//jquery version
+				
+				//draw preview
+			}
+			
+			//function to clear mouse coords upon mouse exit
+			function canvasClearCoords(){
+				mouseX = 0;
+				mouseY = 0;
+				//document.getElementById("mouseCoordsOutput").innerHTML = "(" + mouseX + "," + mouseY + ")";
+				$("#mouseCoordsOutput").html("(" + mouseX + "," + mouseY + ")");	//jquery version
+			}
+			
+			//begin drawing on mouse down
+			function beginDraw(e){
+				mouseStartX = mouseX - canvasXOffset;
+				mouseStartY = mouseY - canvasYOffset;
+				console.log("Begin Drawing at (" + mouseStartX + "," + mouseStartY + ")");
+			}
+			
+			//function to enable or disable shape-specific properties
+			function shapePropertiesUpdate(){
+				//document.getElementById("canvasTextProperty").disabled = true;
+				$("#canvasTextProperty").prop("disabled", true);	//jquery version
+				$("#canvasTextSizeProperty").prop("disabled", true);
+				$("#spawnshape_isFilled").prop("disabled", false)
+				if (document.getElementById("select-shape-type").value == "circle"){
+				}else if (document.getElementById("select-shape-type").value == "rectangle"){
+				}else if (document.getElementById("select-shape-type").value == "line"){
+					$("#spawnshape_isFilled").prop("disabled", true)
+				}else if (document.getElementById("select-shape-type").value == "text"){
+					//document.getElementById("canvasTextProperty").disabled = false;
+					$("#canvasTextProperty").prop("disabled", false);	//jquery version
+					$("#canvasTextSizeProperty").prop("disabled", false);
+				}
+				console.log("updated properties for shapes");
+			}
+			
+			//creates shape
+			function displayShape(){
+				
+				ctx.beginPath();
+				//if (document.getElementById("select-shape-type").value == "circle"){
+				if (document.getElementById("select-shape-type").value == "circle"){
+					ctx.arc(mouseStartX, mouseStartY, (((mouseX - mouseStartX) - canvasXOffset) + ((mouseY - mouseStartY) - canvasYOffset)), 0, 2 * Math.PI);
+					ctx.lineWidth = sliderThick.value;
+					shapeBorderColor();		//call function to handle the border color and thickness
+					shapeFillAndColor();	//call function to handle filling and coloring
+				}else if (document.getElementById("select-shape-type").value == "rectangle"){
+					ctx.rect(mouseStartX, mouseStartY, (mouseX - mouseStartX) - canvasXOffset, (mouseY - mouseStartY) - canvasYOffset);
+					ctx.lineWidth = sliderThick.value;
+					shapeBorderColor();		//call function to handle the border color and thickness
+					shapeFillAndColor();	//call function to handle filling and coloring
+				}else if (document.getElementById("select-shape-type").value == "line"){
+					ctx.lineWidth = sliderThick.value;
+					ctx.beginPath();
+					ctx.moveTo(mouseStartX, mouseStartY);
+					ctx.lineTo(mouseX - canvasXOffset, mouseY - canvasYOffset);
+					shapeBorderColor();		//call function to handle the border color and thickness
+					shapeFillAndColor();	//call function to handle filling and coloring
+				}else if (document.getElementById("select-shape-type").value == "text"){
+					ctx.lineWidth = sliderThick.value;
+					shapeBorderColor();		//call function to handle the border color and thickness
+					shapeFillAndColor();	//call function to handle filling and coloring
+					ctx.font = (100 * $("#canvasTextSizeProperty").val()) + "% Arial";
+					if (spawnshape_isFilled.checked){
+						ctx.fillText(canvasText.value, mouseStartX, mouseStartY);
+					}else{
+						ctx.strokeText(canvasText.value, mouseStartX, mouseStartY);
+					}
+				}
+				console.log("Created a " + document.getElementById("select-shape-type").value + " at start position (" + mouseStartX + ", " + mouseStartY + ") and finish position " + mouseX + "," + mouseY + " with a size difference of (" + (mouseX - mouseStartX) + "," + (mouseY - mouseStartY) + ") and a border thickness of " + sliderThick.value);
+			}
+			
+			//clears the canvas
+			function clearCanvas(){
+				ctx.clearRect(0, 0, c.width, c.height);
+				console.log("Cleared canvas");
+			}
+			
+			//function to handle color and fill
+			function shapeFillAndColor(){
+				if (spawnshape_isFilled.checked){
+					ctx.fillStyle = "rgba(" + sliderColorRed.value + ", " + sliderColorGreen.value + ", " + sliderColorBlue.value + ", " + sliderColorAlpha.value + ")";
+					ctx.fill();
+				}else{
+					ctx.stroke();
+				}
+			}
+			
+			//function to handle border color and thickness
+			function shapeBorderColor(){
+				ctx.strokeStyle = "rgb(" + sliderColorBorderRed.value + ", " + sliderColorBorderGreen.value + ", " + sliderColorBorderBlue.value + ")"; 
+			}
+			
+			//functions to handle slider input updates are housed in the "extra1" javascript file
+			
+		</script>
+	</body>
+</html>
